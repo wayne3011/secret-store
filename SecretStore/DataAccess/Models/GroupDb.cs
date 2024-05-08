@@ -1,0 +1,10 @@
+﻿namespace SecretStore.DataAccess.Models;
+
+public class GroupDb
+{
+    public required string Name { get;set; }
+    public Guid Id { get;set; }
+    public required ICollection<SecretDb> Secrets { get;set; } 
+    public required ICollection<UserDb> Users { get;set;}
+    
+}
