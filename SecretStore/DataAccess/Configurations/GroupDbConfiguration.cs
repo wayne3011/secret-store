@@ -16,6 +16,8 @@ public class GroupDbConfiguration : IEntityTypeConfiguration<GroupDb>
         builder.HasIndex(e => e.Name)
             .IsUnique();
 
+        //builder.HasAlternateKey(e => e.Name);
+
         builder.HasMany(x => x.Users)
             .WithMany(x => x.Groups);
 

@@ -18,5 +18,9 @@ public class SecretDbConfiguration : IEntityTypeConfiguration<SecretDb>
             .WithMany(x => x.Secrets)
             .HasForeignKey(x => x.GroupId)
             .IsRequired();
+
+        builder.HasOne(x => x.Occupier)
+            .WithMany(x => x.Secrets)
+            .HasForeignKey(x => x.OccupierId);
     }
 }

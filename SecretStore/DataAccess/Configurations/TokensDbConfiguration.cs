@@ -9,8 +9,7 @@ public class TokensDbConfiguration : IEntityTypeConfiguration<TokensDb>
     public void Configure(EntityTypeBuilder<TokensDb> builder)
     {
         builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.AccessToken).IsRequired();
+        
         builder.Property(x => x.RefreshToken).IsRequired();
         builder.Property(x => x.UserId).IsRequired();
 

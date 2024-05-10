@@ -12,6 +12,7 @@ public class UserDbConfiguration : IEntityTypeConfiguration<UserDb>
 
         builder.HasIndex(x => x.ClientId)
             .IsUnique();
+        //builder.HasAlternateKey(x => x.ClientId);
         
         builder.Property(x => x.ClientSecret).IsRequired();
 

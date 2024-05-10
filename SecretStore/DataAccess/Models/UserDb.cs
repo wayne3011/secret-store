@@ -7,4 +7,5 @@ public record UserDb
     public required string ClientSecret { get; set; }
     public required ICollection<GroupDb> Groups { get; set; }
     public ICollection<TokensDb> Tokens { get; set; }
+    public ICollection<SecretDb> Secrets { get; set; }
 }

@@ -9,5 +9,7 @@ public record SecretDb
     public required string Name { get; set; }
     public required string Value { get; set; }
     public bool Occupied { get; set; }
+    public Guid? OccupierId { get; set; }
     public GroupDb Group { get; set; } 
+    public UserDb Occupier { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SecretStore.DataAccess.Models;
 
-public class GroupDb
+public record GroupDb
 {
     public required string Name { get;set; }
     public Guid Id { get;set; }
