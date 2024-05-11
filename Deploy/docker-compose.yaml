@@ -11,8 +11,8 @@ services:
       - secret-store-dev
     restart: always
     ports:
-      - "16384:8080"
-      - "16385:8081"
+      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - pgsql-secret-storage
     environment:
@@ -35,5 +35,3 @@ services:
       - secret-store-dev
 volumes:
   secret_storage_pgdata:
-
-    
