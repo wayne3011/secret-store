@@ -10,7 +10,7 @@ WORKDIR /src
 COPY ["SecretStore/SecretStore.csproj", "SecretStore/"]
 RUN dotnet restore "SecretStore/SecretStore.csproj"
 COPY . .
-WORKDIR "/src/secret-store"
+WORKDIR "/src/SecretStore"
 RUN dotnet build "SecretStore.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
