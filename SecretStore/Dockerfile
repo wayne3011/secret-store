@@ -7,17 +7,17 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["secret-store/secret-store.csproj", "secret-store/"]
-RUN dotnet restore "secret-store/secret-store.csproj"
+COPY ["SecretStore/SecretStore.csproj", "SecretStore/"]
+RUN dotnet restore "SecretStore/SecretStore.csproj"
 COPY . .
 WORKDIR "/src/secret-store"
-RUN dotnet build "secret-store.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "SecretStore.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "secret-store.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "SecretStore.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "secret-store.dll"]
+ENTRYPOINT ["dotnet", "SecretStore.dll"]
