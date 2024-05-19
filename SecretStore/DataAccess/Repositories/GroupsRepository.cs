@@ -30,7 +30,7 @@ public class GroupsRepository : IGroupsRepository
 
     public async Task<Group?> Get(string groupName)
     {
-        var groupDb = await _context.Groups.FirstOrDefaultAsync(x => x.Name == groupName);
+        var groupDb = await _context.Groups.Include(x => x.Users).FirstOrDefaultAsync(x => x.Name == groupName);
         return _mapper.Map<Group>(groupDb);
     }
 

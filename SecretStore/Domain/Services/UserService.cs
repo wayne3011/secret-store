@@ -8,8 +8,11 @@ using SecretStore.Domain.Models;
 
 namespace SecretStore.Domain.Services;
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, ITokenService tokenService) : IUserService
 {
+    private readonly ITokenService _tokenService = tokenService
+        ?? throw new ArgumentNullException(nameof(tokenService));
+    
     public async Task<Guid> ValidateCredentials(Credentials credentials)
     {
         var user = await userRepository.Get(credentials.ClientId);
@@ -48,5 +51,18 @@ public class UserService(IUserRepository userRepository) : IUserService
         });
         
         return guid;
+    }
+
+    public async Task<Tokens> Login(string clientId, string clientSecret)
+    {
+        var userId = await ValidateCredentials(new Credentials()
+        {
+            ClientId = clientId,
+            Secret = clientSecret
+        });
+
+        var tokens = await _tokenService.Issue(userId);
+
+        return tokens;
     }
 }

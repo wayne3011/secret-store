@@ -2,7 +2,7 @@
 using SecretStore.Domain.Interfaces.Services;
 using SecretStore.Domain.Interfaces.Services.Exceptions;
 using SecretStore.Web.Attributes;
-using SecretStore.Web.Controllers.DTOs;
+using SecretStore.Web.DTOs;
 
 namespace SecretStore.Web.Controllers;
 [ApiController]
@@ -75,6 +75,27 @@ public class GroupsController : Controller
             });
         }
         catch (InvalidGroupException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unexpected error during adding secret to group!");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
+    }
+
+    [HttpDelete]
+    [AdminAuth]
+    [Route("{groupName}/secrets/{secretName}")]
+    public async Task<IActionResult> DeleteSecret([FromRoute] string groupName, [FromRoute] string secretName)
+    {
+        try
+        {
+            await _groupService.DeleteSecret(groupName, secretName);
+            return NoContent();
+        }
+        catch (Exception e) when (e is InvalidGroupException or InvalidSecretException)
         {
             return BadRequest(e.Message);
         }

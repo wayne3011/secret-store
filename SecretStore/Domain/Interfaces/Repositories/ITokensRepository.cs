@@ -6,6 +6,7 @@ public interface ITokensRepository
 {
     Task<Guid> Add(Guid userId, string refreshToken);
     Task<Guid> Update(Guid userId, string refreshToken);
-    Task<Guid?> Get(string refreshToken);
-    Task<string?> Get(Guid userId);
+    Task<Tokens?> Get(string refreshToken);
+    Task<Tokens?> Get(Guid userId);
+    Task Delete(Guid tokenId);
 }

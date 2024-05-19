@@ -1,17 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SecretStore.DataAccess.Context;
 using SecretStore.DataAccess.Models;
 using SecretStore.Domain.Interfaces.Repositories;
+using SecretStore.Domain.Models;
 
 namespace SecretStore.DataAccess.Repositories;
 
 public class TokensRepository : ITokensRepository
 {
     private readonly StoreDbContext _context;
+    private readonly IMapper _mapper;
 
-    public TokensRepository(StoreDbContext context)
+    public TokensRepository(StoreDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     public async Task<Guid> Add(Guid userId, string refreshToken)
@@ -37,13 +41,20 @@ public class TokensRepository : ITokensRepository
         return token.Id;
     }
 
-    public async Task<Guid?> Get(string refreshToken)
+    public async Task<Tokens?> Get(string refreshToken)
     {
-        return (await _context.Tokens.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken))?.UserId;
+        var tokens = await _context.Tokens.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+        return _mapper.Map<Tokens>(tokens);
     }
 
-    public async Task<string?> Get(Guid userId)
+    public async Task<Tokens?> Get(Guid userId)
     {
-        return (await _context.Tokens.FirstOrDefaultAsync(x => x.UserId == userId))?.RefreshToken;
+        var tokens = await _context.Tokens.FirstOrDefaultAsync(x => x.UserId == userId);
+        return _mapper.Map<Tokens>(tokens);
+    }
+
+    public async Task Delete(Guid tokenId)
+    {
+        await _context.Tokens.Where(x => x.Id == tokenId).ExecuteDeleteAsync();
     }
 }

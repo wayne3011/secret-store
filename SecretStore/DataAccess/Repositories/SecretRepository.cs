@@ -51,4 +51,9 @@ public class SecretRepository : ISecretRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task Delete(Guid secretId)
+    {
+        await _context.Secrets.Where(x => x.Id == secretId).ExecuteDeleteAsync();
+    }
 }

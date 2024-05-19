@@ -5,7 +5,7 @@ using SecretStore.Domain.Interfaces.Services;
 using SecretStore.Domain.Interfaces.Services.Exceptions;
 using SecretStore.Domain.Models;
 using SecretStore.Web.Attributes;
-using SecretStore.Web.Controllers.DTOs;
+using SecretStore.Web.DTOs;
 
 namespace SecretStore.Web.Controllers;
 [ApiController]
@@ -25,19 +25,18 @@ public class AuthController : Controller
     [HttpPost]
     [Route("login")]
     [AllowAnonymous]
+    [ProducesResponseType(type: typeof(TokensDto), statusCode: StatusCodes.Status200OK)]
+    [ProducesResponseType(type: typeof(string), statusCode: StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(type: typeof(string), statusCode: StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Login(AuthDto authDto)
     {
         try
         {
-            var userId = await _userService.ValidateCredentials(new Credentials()
-            {
-                ClientId = authDto.ClientId,
-                Secret = authDto.ClientSecret
-            });
+            var tokens = await _userService.Login(
+                clientId: authDto.ClientId, 
+                clientSecret: authDto.ClientSecret);
 
-            var tokens = await _tokenService.IssueTokens(userId);
-
-            return Ok(new
+            return Ok(new TokensDto()
             {
                 AccessToken = tokens.AccessToken,
                 RefreshToken = tokens.RefreshToken,
@@ -62,7 +61,7 @@ public class AuthController : Controller
     {
         try
         {
-            var tokens = await _tokenService.ReissueTokens(refreshToken);
+            var tokens = await _tokenService.Reissue(refreshToken);
             return Ok(tokens);
 
         }
@@ -101,6 +100,29 @@ public class AuthController : Controller
         catch (Exception e)
         {
             _logger.LogError(e, "Unexpected error during adding new user!");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
+    }
+
+    [HttpDelete]
+    [Route("logout")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK)]
+    [ProducesResponseType(type: typeof(string), statusCode: StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(type: typeof(string), statusCode: StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Logout([FromBody] string token)
+    {
+        try
+        {
+            await _tokenService.Delete(token);
+            return Ok();
+        }
+        catch (InvalidRefreshTokenException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unexpected error during refresh token!");
             return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
         }
     }

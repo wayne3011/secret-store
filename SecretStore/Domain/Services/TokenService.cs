@@ -24,7 +24,7 @@ public class TokenService : ITokenService
         _jwtConfiguration = jwtConfiguration.Value;
     }
 
-    public async Task<Tokens> IssueTokens(Guid userId)
+    public async Task<Tokens> Issue(Guid userId)
     {
         var handler = new JwtSecurityTokenHandler();
         var accessToken = handler.WriteToken(GenerateAccessToken(userId));
@@ -33,7 +33,7 @@ public class TokenService : ITokenService
         var oldToken = await _tokensRepository.Get(userId);
         if (oldToken is not null)
         {
-            var token = handler.ReadToken(oldToken);
+            var token = handler.ReadToken(oldToken.RefreshToken);
             if (token.ValidTo > DateTime.UtcNow)
             {
                 throw new AlreadyAuthorizeException("The user is already logged in.");
@@ -50,30 +50,36 @@ public class TokenService : ITokenService
         };
     }
 
-    public async Task<Tokens> ReissueTokens(string refreshToken)
+    public async Task<Tokens> Reissue(string refreshToken)
     {
-        var userId = await _tokensRepository.Get(refreshToken);
+        var tokens = await _tokensRepository.Get(refreshToken);
 
-        if (userId is null)
+        if (tokens is null)
         {
             throw new InvalidRefreshTokenException("Invalid refresh token!");
         }
         
         var handler = new JwtSecurityTokenHandler();
-        var accessToken = handler.WriteToken(GenerateAccessToken(userId.Value));
-        var newRefreshToken = handler.WriteToken(GenerateRefreshToken(userId.Value));
+        var accessToken = handler.WriteToken(GenerateAccessToken(tokens.UserId));
+        var newRefreshToken = handler.WriteToken(GenerateRefreshToken(tokens.UserId));
 
-        var guid = await _tokensRepository.Update(userId.Value, refreshToken);
+        var guid = await _tokensRepository.Update(tokens.UserId, refreshToken);
 
         return new Tokens
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken,
-            UserId = userId.Value,
+            UserId = tokens.UserId,
             Id = guid
         };
     }
-    
+    public async Task Delete(string refreshToken)
+    {
+        var tokens = await _tokensRepository.Get(refreshToken);
+        if (tokens == null) throw new InvalidRefreshTokenException("Invalid refresh token!");
+        await _tokensRepository.Delete(tokens.Id);
+    }
+
     private JwtSecurityToken GenerateAccessToken(Guid userId)
     {
         return new JwtSecurityToken(

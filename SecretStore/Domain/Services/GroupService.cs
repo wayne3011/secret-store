@@ -84,4 +84,23 @@ public class GroupService : IGroupService
 
         return user.Groups.Any(x => x.Name == groupName);
     }
+    
+    public async Task DeleteSecret(string groupName, string secretName)
+    {
+        var group = await _groupsRepository.Get(groupName);
+
+        if (group is null)
+        {
+            throw new InvalidGroupException("Invalid group name.");
+        }
+        
+        var secret = await _secretRepository.Get(group.Id, secretName);
+
+        if (secret is null)
+        {
+            throw new InvalidSecretException("Invalid secret name.");
+        }
+
+        await _secretRepository.Delete(secret.Id);
+    }
 }

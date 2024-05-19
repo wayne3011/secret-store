@@ -7,5 +7,6 @@ public interface IGroupService
     Task<Guid> Create(string name);
     Task AddUser(string groupName, string clientId);
     Task<Secret> AddSecret(string groupName, string name, string value);
+    Task DeleteSecret(string groupName, string secretName);
     Task<bool> CheckHaveAccess(Guid userId, string groupName);
 }

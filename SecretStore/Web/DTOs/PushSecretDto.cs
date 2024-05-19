@@ -1,4 +1,4 @@
-﻿namespace SecretStore.Web.Controllers.DTOs;
+﻿namespace SecretStore.Web.DTOs;
 
 public class PushSecretDto
 {
