@@ -6,7 +6,7 @@ services:
     container_name: storage-service
     build:
       context: https://github.com/wayne3011/secret-store.git
-      dockerfile: ./SecretStore/Dockerfile
+      dockerfile: ./source/SecretStore/Dockerfile
     networks:
       - secret-store-dev
     restart: always
