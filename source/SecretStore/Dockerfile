@@ -5,8 +5,8 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./SecretStore.csproj", "SecretStore/"]
-RUN dotnet restore "SecretStore/SecretStore.csproj"
+COPY ["source/SecretStore/SecretStore.csproj", "SecretStore/"]
+RUN dotnet restore "source/SecretStore/SecretStore.csproj"
 COPY . .
 WORKDIR "/src/SecretStore"
 RUN dotnet build "SecretStore.csproj" -c $BUILD_CONFIGURATION -o /app/build

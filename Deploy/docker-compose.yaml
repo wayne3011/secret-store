@@ -5,7 +5,8 @@ services:
   storage-service:
     container_name: storage-service
     build:
-      context: https://github.com/wayne3011/secret-store.git
+#      context: https://github.com/wayne3011/secret-store.git
+      context: ../
       dockerfile: ./source/SecretStore/Dockerfile
     networks:
       - secret-store-dev
