@@ -3,22 +3,22 @@ networks:
     driver: bridge
 services:
   storage-service:
-    container_name: storage-service
     build:
-      context: https://github.com/wayne3011/secret-store.git
-      dockerfile: ./source/SecretStore/Dockerfile
+      context: https://github.com/wayne3011/secret-store.git#master:source/SecretStore
+      dockerfile: Dockerfile
     networks:
       - secret-store-dev
     restart: always
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "8080"
     depends_on:
       - pgsql-secret-storage
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
       - ./appsettings.json:/app/appsettings.json
+    deploy:
+      replicas: 3
   pgsql-secret-storage:
     image: postgres:latest
     container_name: pgsql-secret-storage
