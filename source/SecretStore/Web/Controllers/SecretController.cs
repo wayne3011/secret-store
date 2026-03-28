@@ -48,7 +48,7 @@ public class SecretController : Controller
     
     [HttpGet]
     [Route("get/{groupName}/{secretName}")]
-    public async Task<IActionResult> Get([FromQuery] string groupName, [FromQuery] string secretName)
+    public async Task<IActionResult> Get(string groupName, string secretName)
     {
         try
         {
