@@ -8,17 +8,18 @@ services:
       dockerfile: Dockerfile
     networks:
       - secret-store-dev
-    restart: always
+    restart: no
     ports:
-      - "8080"
-    depends_on:
-      - pgsql-secret-storage
+      - "8080:8080"
+      - "8081:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
-      - ./appsettings.json:/app/appsettings.json
-    deploy:
-      replicas: 3
+      - ./appsettings.json:/app/build/appsettings.json
+    depends_on:
+      pgsql-secret-storage:
+        condition: service_healthy
+
   pgsql-secret-storage:
     image: postgres:latest
     container_name: pgsql-secret-storage
@@ -33,5 +34,10 @@ services:
       - secret_storage_pgdata:/var/lib/postgresql/data
     networks:
       - secret-store-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d StoreSecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 volumes:
   secret_storage_pgdata:

@@ -46,6 +46,33 @@ public class SecretController : Controller
         }
     }
     
+    [HttpGet]
+    [Route("get/{groupName}/{secretName}")]
+    public async Task<IActionResult> Get([FromQuery] string groupName, [FromQuery] string secretName)
+    {
+        try
+        {
+            var userId = HttpContext.GetUserId();
+            if (!await _groupService.CheckHaveAccess(userId, groupName))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "User in not belong to a group.");
+            }
+
+            var secret = await _secretService.Get(secretName, groupName);
+
+            return Ok(secret);
+        }
+        catch (Exception e) when (e is InvalidGroupException)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unexpected error during checking that secret is busy!");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+        }
+    }
+    
     [HttpPost]
     [Route("occupy")]
     public async Task<IActionResult> Occupy([FromQuery] string groupName, [FromQuery] string secretName)
